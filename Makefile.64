@@ -1,0 +1,211 @@
+#COMAKE2 edit-mode: -*- Makefile -*-
+####################64Bit Mode####################
+ifeq ($(shell uname -m),x86_64)
+CC=gcc
+CXX=g++
+CXXFLAGS=-g \
+  -pipe \
+  -W \
+  -Wall \
+  -fPIC \
+  -fsigned-char \
+  -Wno-unused-parameter \
+  -Wunused-local-typedefs \
+  -Wno-missing-field-initializers
+CFLAGS=-g \
+  -pipe \
+  -W \
+  -Wall \
+  -fPIC \
+  -fsigned-char \
+  -Wunused-local-typedefs
+CPPFLAGS=-g \
+  -DFUSE_USE_VERSION=26 \
+  -D_FILE_OFFSET_BITS=64 \
+  -D_DEBUG \
+  -D_GNU_SOURCE \
+  -D__STDC_LIMIT_MACROS \
+  -D__STDC_FORMAT_MACROS \
+  -D_USE_PBRPC \
+  -D_USE_TCMALLOC \
+  -D__HEAP_PROFILER__ \
+  -DMOCKVIRTUAL= \
+  -Wno-missing-field-initializers
+INCPATH=-I../../../../ \
+  -I../sdk/cpp \
+  -I. \
+  -I./src
+DEP_INCPATH=-I. \
+
+#============ CCP vars ============
+CCHECK=@ccheck.py
+CCHECK_FLAGS=
+PCLINT=@pclint
+PCLINT_FLAGS=
+CCP=@ccp.py
+CCP_FLAGS=
+
+
+#COMAKE UUID
+COMAKE_MD5=fae5ff2824f3be1a12e0eb24d6d41760  COMAKE
+
+
+.PHONY:all
+all: bos_mnt output-conf 
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mall[0m']"
+	@echo "make all done"
+
+.PHONY:comake2_makefile_check
+comake2_makefile_check:
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mcomake2_makefile_check[0m']"
+	#in case of error, update 'Makefile' by 'comake2'
+	@echo "$(COMAKE_MD5)">comake2.md5
+	@md5sum -c --status comake2.md5
+	@rm -f comake2.md5
+
+.PHONY:ccpclean
+ccpclean:
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mccpclean[0m']"
+	@echo "make ccpclean done"
+
+.PHONY:clean
+clean:ccpclean
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mclean[0m']"
+	rm -rf bos_mnt
+	rm -rf ./output/bin/bos_mnt
+	rm -rf output/conf/*
+	rm -rf src/bos_mnt_bos_cache_fs.o
+	rm -rf src/bos_mnt_bos_fs.o
+	rm -rf src/bos_mnt_bos_fuse.o
+	rm -rf src/bos_mnt_file_cache.o
+	rm -rf src/bos_mnt_fs_config.o
+	rm -rf src/bos_mnt_log.o
+	rm -rf src/bos_mnt_main.o
+
+.PHONY:dist
+dist:
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mdist[0m']"
+	tar czvf output.tar.gz output
+	@echo "make dist done"
+
+.PHONY:distclean
+distclean:clean
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mdistclean[0m']"
+	rm -f output.tar.gz
+	@echo "make distclean done"
+
+.PHONY:love
+love:
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mlove[0m']"
+	@echo "make love done"
+
+bos_mnt:src/bos_mnt_bos_cache_fs.o \
+  src/bos_mnt_bos_fs.o \
+  src/bos_mnt_bos_fuse.o \
+  src/bos_mnt_file_cache.o \
+  src/bos_mnt_fs_config.o \
+  src/bos_mnt_log.o \
+  src/bos_mnt_main.o
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40mbos_mnt[0m']"
+	$(CXX) src/bos_mnt_bos_cache_fs.o \
+  src/bos_mnt_bos_fs.o \
+  src/bos_mnt_bos_fuse.o \
+  src/bos_mnt_file_cache.o \
+  src/bos_mnt_fs_config.o \
+  src/bos_mnt_log.o \
+  src/bos_mnt_main.o -Xlinker "-("  ../sdk/cpp/libboss_sdk.a \
+  -lcurl \
+  -ljsoncpp \
+  -lfuse \
+  -lssl -lcrypto \
+  -lglog -lgflags \
+  -lpthread \
+  -lldap \
+  -lrt \
+  -llber \
+  -ldl \
+  -luuid \
+  -lz \
+  -L/usr/local/lib \
+  -lssh2 -Xlinker "-)" -o bos_mnt
+	mkdir -p ./output/bin/
+	cp -f --link bos_mnt ./output/bin/
+
+.PHONY:output-conf
+output-conf:
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40moutput-conf[0m']"
+	cp -rf conf/ output/
+
+src/bos_mnt_bos_cache_fs.o:src/bos_cache_fs.cpp \
+  src/bos_cache_fs.h \
+  src/common_def.h \
+  src/log.h \
+  src/bos_fs.h \
+  src/refable.h \
+  src/lock.h \
+  src/file_cache.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40msrc/bos_mnt_bos_cache_fs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o src/bos_mnt_bos_cache_fs.o src/bos_cache_fs.cpp
+
+src/bos_mnt_bos_fs.o:src/bos_fs.cpp \
+  src/bos_fs.h \
+  src/common_def.h \
+  src/log.h \
+  src/refable.h \
+  src/lock.h \
+  src/fs_config.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40msrc/bos_mnt_bos_fs.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o src/bos_mnt_bos_fs.o src/bos_fs.cpp
+
+src/bos_mnt_bos_fuse.o:src/bos_fuse.cpp \
+  src/common_def.h \
+  src/log.h \
+  src/fs_config.h \
+  src/opendir_id.h \
+  src/file_cache.h \
+  src/refable.h \
+  src/lock.h \
+  src/bos_fuse.h \
+  src/bos_fs.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40msrc/bos_mnt_bos_fuse.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o src/bos_mnt_bos_fuse.o src/bos_fuse.cpp
+
+src/bos_mnt_file_cache.o:src/file_cache.cpp \
+  src/file_cache.h \
+  src/common_def.h \
+  src/log.h \
+  src/refable.h \
+  src/lock.h \
+  src/fs_config.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40msrc/bos_mnt_file_cache.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o src/bos_mnt_file_cache.o src/file_cache.cpp
+
+src/bos_mnt_fs_config.o:src/fs_config.cpp \
+  src/common_def.h \
+  src/log.h \
+  src/fs_config.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40msrc/bos_mnt_fs_config.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o src/bos_mnt_fs_config.o src/fs_config.cpp
+
+src/bos_mnt_log.o:src/log.cpp \
+  src/log.h \
+  src/common_def.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40msrc/bos_mnt_log.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o src/bos_mnt_log.o src/log.cpp
+
+src/bos_mnt_main.o:src/main.cpp \
+  src/common_def.h \
+  src/log.h \
+  src/bos_fuse.h \
+  src/bos_fs.h \
+  src/refable.h \
+  src/lock.h \
+  src/bos_cache_fs.h \
+  src/fs_config.h \
+  src/file_cache.h
+	@echo "[[1;32;40mCOMAKE:BUILD[0m][Target:'[1;32;40msrc/bos_mnt_main.o[0m']"
+	$(CXX) -c $(INCPATH) $(DEP_INCPATH) $(CPPFLAGS) $(CXXFLAGS)  -o src/bos_mnt_main.o src/main.cpp
+
+endif #ifeq ($(shell uname -m),x86_64)
+
+

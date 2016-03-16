@@ -1,0 +1,37 @@
+#ifndef BAIDU_BCE_BOS_FS_LOG_H_
+#define BAIDU_BCE_BOS_FS_LOG_H_
+#include <sys/types.h>
+#include "common_def.h"
+BEGIN_FS_NAMESPACE
+int InitSdkLog();
+
+#define FS_LOG_LEVEL_DEBUG 16
+#define FS_LOG_LEVEL_TRACE 8
+#define FS_LOG_LEVEL_WARNING 4
+#define FS_LOG_LEVEL_ERROR 2
+#define FS_LOG_LEVEL_FATAL 0
+
+typedef int (*FsLogger) (const char *format, ...);
+FsLogger GetFsLogger();
+#define FS_RAW_LOG(format, ...) GetFsLogger()(format, ##__VA_ARGS__)
+
+void LogPrefix(int level);
+
+#define FS_LOG(level, format, ...)\
+{\
+    LogPrefix(level);\
+    FS_RAW_LOG("%s:%d-<%s>: ", __FILE__, __LINE__, __FUNCTION__);\
+    FS_RAW_LOG(format, ##__VA_ARGS__);\
+    FS_RAW_LOG("\n");\
+}
+
+#define FS_DEBUG(format, ...) FS_LOG(FS_LOG_LEVEL_DEBUG, format, ##__VA_ARGS__)
+#define FS_TRACE(format, ...) FS_LOG(FS_LOG_LEVEL_TRACE, format, ##__VA_ARGS__)
+#define FS_WARNING(format, ...) FS_LOG(FS_LOG_LEVEL_WARNING, format, ##__VA_ARGS__)
+#define FS_ERROR(format, ...) FS_LOG(FS_LOG_LEVEL_ERROR, format, ##__VA_ARGS__)
+#define FS_FATAL(format, ...) FS_LOG(FS_LOG_LEVEL_FATAL, format, ##__VA_ARGS__)
+
+END_FS_NAMESPACE
+
+#endif //BAIDU_INF_BCE_BOS_FS_LOG_H_
+

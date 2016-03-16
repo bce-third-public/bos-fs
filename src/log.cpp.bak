@@ -1,0 +1,52 @@
+#include "log.h"
+
+#include <stdio.h>
+#include <string>
+#include <time.h>
+#include <sys/time.h>
+#include <stdarg.h>
+
+#include "util/bos_log.h"
+
+BEGIN_FS_NAMESPACE
+static int LogToStderr(const std::string &message) {
+    // return fprintf(stderr, "%s\n", message.c_str());
+    return 0;
+}
+
+int InitSdkLog() {
+    ::bce::bos::Log::UserPrint = LogToStderr;
+    return 0;
+}
+
+void LogPrefix(int level) {
+    const char *level_str = "DEBUG";
+    if (level <= FS_LOG_LEVEL_FATAL) {
+        level_str = "FATAL";
+    } else if (level <= FS_LOG_LEVEL_ERROR) {
+        level_str = "ERROR";
+    } else if (level <= FS_LOG_LEVEL_WARNING) {
+        level_str = "WARNING";
+    } else if (level <= FS_LOG_LEVEL_TRACE) {
+        level_str = "TRACE";
+    }
+
+    struct timeval    tv;
+    gettimeofday(&tv, NULL);
+    struct tm         *p = localtime(&tv.tv_sec);
+    FS_RAW_LOG("[%s] %d-%d-%d %d:%d:%d.%3ld ", level_str, 1900+p->tm_year, 1+p->tm_mon, p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec, tv.tv_usec / 1000);
+}
+
+int StderrLogger(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    int ret = vfprintf(stderr, format, args);
+    va_end(args);
+    return ret;
+}
+
+FsLogger GetFsLogger() {
+    return StderrLogger;
+}
+
+END_FS_NAMESPACE

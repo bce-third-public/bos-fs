@@ -14,7 +14,7 @@ def BosFsck(bucket, root = ""):
         for file in response.contents:
             if file.key.endswith("/"):
                 continue
-                
+
             files[file.key] = file
         for dir in response.common_prefixes:
             dirs[dir.prefix] = dir
@@ -82,4 +82,4 @@ def BosFsck(bucket, root = ""):
         BosFsck(bucket, dir)
 
 
-BosFsck("cuican-public")
+BosFsck(bucket)

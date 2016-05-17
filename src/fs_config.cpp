@@ -14,8 +14,8 @@ DEFINE_string(endpoint, "bos.qasandbox.bcetest.baidu.com", "you endpoint");
 DEFINE_string(ak, "fe958d90ca964f4193bc3a468f55fa8f", "you access key");
 DEFINE_string(sk, "c5fbf4af89aa4e59a98bb8539f6815a1", "you access secret");
 
-DEFINE_string(local_user, "work", "local user name");
-DEFINE_string(local_group, "work", "local group name");
+DEFINE_string(local_user, "root", "local user name");
+DEFINE_string(local_group, "root", "local group name");
 
 DEFINE_string(cache_root, "", "local group name");
 DEFINE_bool(use_cache, false, "use cache");
